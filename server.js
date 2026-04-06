@@ -182,7 +182,13 @@ app.post("/deploy", upload.single("file"), async (req, res) => {
       throw new Error("Vercel did not return a valid URL");
     }
 
-    const result = deploymentUrl.replace(/https:\/\/([^-]+-[^-]+)-.*\.vercel\.app/, "https://$1.vercel.app/");
+    const url = new URL(deploymentUrl);
+    const parts = url.hostname.split("-");
+
+    // take everything except last 3 parts (random + username + projects)
+    const base = parts.slice(0, -3).join("-");
+
+    const result = `https://${base}.vercel.app/`;
 
     // Success response
     res.json({
